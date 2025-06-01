@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { IconEdit, IconSave, IconLoader2 } from '@tabler/icons-react';
+import { IconEdit, IconDeviceFloppy, IconLoader2 } from '@tabler/icons-react';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -120,8 +120,7 @@ const Profile = () => {
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
         >
           {editing ? (
-            <>
-              <IconSave size={20} />
+            <>              <IconDeviceFloppy size={20} />
               <span>Save</span>
             </>
           ) : (

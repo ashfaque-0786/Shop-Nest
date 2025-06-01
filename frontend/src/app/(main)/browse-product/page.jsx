@@ -2,14 +2,15 @@
 import axios from "axios";
 import Link from "next/link";
 import { useSearchParams } from 'next/navigation';
-import React, { useState, useEffect } from "react";
-import { FaSearch, FaFilter, FaSortAmountDown, FaTimes, FaHeart } from 'react-icons/fa';
+import React, { useState, useEffect, Suspense } from "react";
+import { FaSearch, FaFilter, FaSortAmountDown, FaTimes, FaHeart, FaSpinner } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 
-const BrowseProduct = () => {
+const ProductList = () => {
   const searchParams = useSearchParams();
   const [productList, setProductList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState({
     categories: [],
     brands: []
@@ -22,17 +23,21 @@ const BrowseProduct = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { addToCart } = useCart();
-  const { addToWishlist, isInWishlist } = useWishlist();
-  const fetchProducts = async () => {
+  const { addToWishlist, isInWishlist } = useWishlist();  const fetchProducts = async () => {
+    setIsLoading(true);
     try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      
       // First, try to get all products if no filters are applied
       if (!searchQuery && !selectedCategory && !selectedBrand && !priceRange.min && !priceRange.max && !sortBy) {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/getall`);
+        const res = await axios.get(`${baseUrl}/product/getall`);
+        if (!res.data) throw new Error('No data received from server');
+        
         setProductList(res.data);
         
         // Get categories and brands from the products
-        const categories = [...new Set(res.data.map(product => product.category))];
-        const brands = [...new Set(res.data.map(product => product.brand))];
+        const categories = [...new Set(res.data.filter(p => p.category).map(product => product.category))];
+        const brands = [...new Set(res.data.filter(p => p.brand).map(product => product.brand))];
         setFilters({ categories, brands });
         return;
       }
@@ -45,29 +50,32 @@ const BrowseProduct = () => {
         ...(priceRange.min && { minPrice: priceRange.min }),
         ...(priceRange.max && { maxPrice: priceRange.max }),
         ...(sortBy && { sortBy, sortOrder })
-      });
-
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/search?${queryParams}`);
+      });      const res = await axios.get(`${baseUrl}/product/search?${queryParams}`);
       if (res.data.products) {
         setProductList(res.data.products);
         setFilters({
           categories: res.data.filters.categories || [],
           brands: res.data.filters.brands || []
         });
+      } else {
+        throw new Error('Invalid response format from search endpoint');
       }
     } catch (error) {
       console.error("Error fetching products:", error);
       // Use getall as fallback if search fails
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/getall`);
+        const res = await axios.get(`${baseUrl}/product/getall`);
+        if (!res.data) throw new Error('No data received from server');
+        
         setProductList(res.data);
-        const categories = [...new Set(res.data.map(product => product.category))];
-        const brands = [...new Set(res.data.map(product => product.brand))];
+        const categories = [...new Set(res.data.filter(p => p.category).map(product => product.category))];
+        const brands = [...new Set(res.data.filter(p => p.brand).map(product => product.brand))];
         setFilters({ categories, brands });
-      } catch (fallbackError) {
-        console.error("Fallback error:", fallbackError);
+      } catch (fallbackError) {        console.error("Fallback error:", fallbackError);
         setProductList([]);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -252,11 +260,13 @@ const BrowseProduct = () => {
                 <FaFilter className="w-5 h-5" />
                 <span>Show Filters</span>
               </button>
-            </div>
-
-            {/* Products Grid */}
+            </div>            {/* Products Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-10">
-              {productList.length > 0 ? (
+              {isLoading ? (
+                <div className="col-span-full flex justify-center items-center py-20">
+                  <FaSpinner className="w-8 h-8 animate-spin text-blue-600" />
+                </div>
+              ) : productList.length > 0 ? (
                 productList.map((product) => (
                   <div
                     key={product._id}
@@ -328,6 +338,18 @@ const BrowseProduct = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const BrowseProduct = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+        <FaSpinner className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <ProductList />
+    </Suspense>
   );
 };
 
