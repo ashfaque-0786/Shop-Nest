@@ -56,7 +56,7 @@ const EditProduct = () => {
     validationSchema: ProductSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.put(`http://localhost:5000/product/update/${id}`, values);
+        const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/product/update/${id}`, values);
         toast.success("Product updated successfully!");
         console.log(response.data);
       } catch (error) {
@@ -68,7 +68,7 @@ const EditProduct = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/product/getbyid/${id}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/getbyid/${id}`);
       const product = response.data;
       
       // Set form values

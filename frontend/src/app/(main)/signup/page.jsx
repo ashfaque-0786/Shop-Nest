@@ -38,7 +38,7 @@ const Signup = () => {
       confirmPassword: "",
     },
     onSubmit: async (values, { resetForm, setSubmitting }) => {
-      try {        const response = await axios.post("http://localhost:5000/user/register", {
+      try {        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/register`, {
           name: values.name,
           email: values.email,
           password: values.password,

@@ -20,7 +20,7 @@ const ManageProduct = () => {
         sortBy: sortField,
         sortOrder: sortOrder
       });
-      const res = await axios.get(`http://localhost:5000/product/search?${queryParams}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/search?${queryParams}`);
       setProducts(res.data.products);
       setLoading(false);
     } catch (error) {
@@ -38,7 +38,7 @@ const ManageProduct = () => {
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`http://localhost:5000/product/delete/${productId}`);
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/product/delete/${productId}`);
         toast.success("Product deleted successfully");
         fetchProducts(); // Refresh the list
       } catch (error) {

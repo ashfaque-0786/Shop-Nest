@@ -27,7 +27,7 @@ const BrowseProduct = () => {
     try {
       // First, try to get all products if no filters are applied
       if (!searchQuery && !selectedCategory && !selectedBrand && !priceRange.min && !priceRange.max && !sortBy) {
-        const res = await axios.get('http://localhost:5000/product/getall');
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/getall`);
         setProductList(res.data);
         
         // Get categories and brands from the products
@@ -47,7 +47,7 @@ const BrowseProduct = () => {
         ...(sortBy && { sortBy, sortOrder })
       });
 
-      const res = await axios.get(`http://localhost:5000/product/search?${queryParams}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/search?${queryParams}`);
       if (res.data.products) {
         setProductList(res.data.products);
         setFilters({
@@ -59,7 +59,7 @@ const BrowseProduct = () => {
       console.error("Error fetching products:", error);
       // Use getall as fallback if search fails
       try {
-        const res = await axios.get('http://localhost:5000/product/getall');
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/getall`);
         setProductList(res.data);
         const categories = [...new Set(res.data.map(product => product.category))];
         const brands = [...new Set(res.data.map(product => product.brand))];

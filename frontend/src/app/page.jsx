@@ -29,7 +29,7 @@ const HomePage = () => {
 
       // Fetch products from each category
       for (const category of categories) {
-        const res = await axios.get(`http://localhost:5000/product/search?category=${category}`);
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/product/search?category=${category}`);
         // Take first two products from each category
         const categoryProducts = res.data.products.slice(0, 2);
         allProducts = [...allProducts, ...categoryProducts];

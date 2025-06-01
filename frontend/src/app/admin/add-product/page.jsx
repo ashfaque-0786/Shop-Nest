@@ -52,7 +52,7 @@ const AddProduct = () => {
     validationSchema: ProductSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post("http://localhost:5000/product/add", values);
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/product/add`, values);
         toast.success("Product added successfully!");
         console.log(response.data);
         // Reset form

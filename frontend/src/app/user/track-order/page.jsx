@@ -20,7 +20,7 @@ const TrackOrder = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/order/user', {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/order/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

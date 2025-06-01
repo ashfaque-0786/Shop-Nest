@@ -32,7 +32,7 @@ const Profile = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/user/profile', {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user/profile`, {
         headers: { 'x-auth-token': token }
       });
 
@@ -85,7 +85,7 @@ const Profile = () => {
         updateData.password = formData.newPassword;
       }
 
-      await axios.put('http://localhost:5000/user/profile', updateData, {
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/user/profile`, updateData, {
         headers: { 'x-auth-token': token }
       });
 

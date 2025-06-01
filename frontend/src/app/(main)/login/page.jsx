@@ -24,7 +24,7 @@ const Login = () => {
     },    onSubmit: (values) => {
       console.log(values); // send value to the backend
       axios
-        .post("http://localhost:5000/user/login", values)
+        .post(`${process.env.NEXT_PUBLIC_API_URL}/user/login`, values)
         .then((result) => {
           toast.success("login successful");
           console.log(result.data?.token);
